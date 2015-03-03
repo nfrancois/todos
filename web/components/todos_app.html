@@ -18,9 +18,12 @@
         background: #4285f4;
         color: #fff;
       }
+      paper-button {
+        margin-top: 25px;
+      }
     </style>
     <core-toolbar id="mainheader">
-      <span flex>Todos list : {{remaining}}/{{todos.length}}</span>
+      <span flex>Todos list</span>
        <paper-icon-button icon="delete"></paper-icon-button>
     </core-toolbar>
     <p>
@@ -28,11 +31,11 @@
         <todo-item todo="{{todo}}"></todo-item>
       </template>
     </p>
-    <p layout horizontal>
-      <paper-input-decorator label="Task" floatingLabel error="name is required!" autoValidate>
-        <input is="core-input" required>
-      </paper-input-decorator>
-      <paper-button raised class="colored">Add</paper-button>
+    <p class layout horizontal>
+        <paper-input-decorator label="Task" floatingLabel error="name is required!" autoValidate>
+          <input is="core-input" required>
+        </paper-input-decorator>
+        <paper-button raised class="colored">Add</paper-button>
     </p>
   </template>
   <script type="application/dart" src="todos_app.dart"></script>
