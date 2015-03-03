@@ -1,0 +1,14 @@
+build
+packages
+out
+pubspec.lock
+*.dart.js
+*.dart.precompiled.js
+*.js_
+*.js.deps
+*.js.map
+
+.project
+.settings
+.buildlog
+.pub
