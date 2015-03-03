@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:clientserver/model.dart';
+import 'package:todos/model.dart';
 
 final nameInput = querySelector("#name");
 final itemsTable = querySelector("#items");

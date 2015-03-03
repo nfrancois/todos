@@ -1,0 +1,30 @@
+<link rel="import" href="packages/polymer/polymer.html">
+<link rel="import" href="packages/core_elements/core_label.html">
+<link rel="import" href="packages/paper_elements/paper_checkbox.html">
+<link rel="import" href="packages/paper_elements/paper_shadow.html">
+<link rel="import" href="packages/paper_elements/paper_item.html">
+<link rel="import" href="packages/paper_elements/paper_input.html">
+
+<polymer-element name="todo-item">
+  <template>  
+    <style>
+      paper-checkbox {
+        padding: 20px 20px 20px 0;
+      }
+      paper-shadow {
+        width : 380px;
+      }
+    </style>
+    <paper-shadow>
+      <paper-item>
+        <core-label horizontal layout>
+          <paper-checkbox checked="{{todo.done}}" for></paper-checkbox>
+          <div>
+            <h4>{{todo.name}}</h4>
+          </div>
+        </core-label>
+       </paper-item>
+     </paper-shadow>    
+  </template>
+  <script type="application/dart" src="todo_item.dart"></script>
+</polymer-element>

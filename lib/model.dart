@@ -5,9 +5,11 @@
 library clientserver.model;
 
 import 'package:gcloud/db.dart';
+import 'package:polymer/polymer.dart';
 
+// TODO rename
 @Kind()
-class Item extends Model {
+class Item extends Model with Observable {
   @StringProperty()
   String name;
   @BoolProperty()

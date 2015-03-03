@@ -13,7 +13,7 @@ import 'package:shelf_appengine/shelf_appengine.dart';
 import 'package:shelf_route/shelf_route.dart';
 import 'package:uri/uri.dart';
 
-import 'package:clientserver/model.dart';
+import 'package:todos/model.dart';
 
 Key get itemsRoot => context.services.db.emptyKey.append(Item, id: 1);
 

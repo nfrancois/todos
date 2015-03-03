@@ -1,0 +1,39 @@
+<link rel="import" href="packages/polymer/polymer.html">
+<link rel="import" href="todo_item.html">
+<link rel="import" href="packages/core_elements/core_toolbar.html">
+<link rel="import" href="packages/paper_elements/paper_icon_button.html">
+<link rel="import" href="packages/paper_elements/paper_button.html">
+
+<polymer-element name="todos-app">
+  <template>
+    <style>
+      paper-input-decorator {
+        width: 300px;
+      }
+      p {
+        margin: 20px;
+        padding: 0 20px;
+      }
+      paper-button[raised].colored {
+        background: #4285f4;
+        color: #fff;
+      }
+    </style>
+    <core-toolbar id="mainheader">
+      <span flex>Todos list : {{remaining}}/{{todos.length}}</span>
+       <paper-icon-button icon="delete"></paper-icon-button>
+    </core-toolbar>
+    <p>
+      <template repeat="{{todo in todos}}">
+        <todo-item todo="{{todo}}"></todo-item>
+      </template>
+    </p>
+    <p layout horizontal>
+      <paper-input-decorator label="Task" floatingLabel error="name is required!" autoValidate>
+        <input is="core-input" required>
+      </paper-input-decorator>
+      <paper-button raised class="colored">Add</paper-button>
+    </p>
+  </template>
+  <script type="application/dart" src="todos_app.dart"></script>
+</polymer-element>
