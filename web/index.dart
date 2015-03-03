@@ -30,12 +30,8 @@ void addItem(Item item) {
 }
 
 void onCreate(MouseEvent event) {
-  var item = new Item()..name = nameInput.value;
-  var error = item.validate();
-  if (error != null) {
-    window.alert(error);
-  } else {
-    restPost('/items', item.serialize()).then((result) {
+  var item = new Item.fromName(nameInput.value);
+  restPost('/items', item.serialize()).then((result) {
       if (!result['success']) {
         errorMessage.text = 'Server error: ${result['error']}';
       } else {
@@ -43,7 +39,6 @@ void onCreate(MouseEvent event) {
         addItem(item);
       }
     });
-  }
 }
 
 Future restGet(String path) {

@@ -8,22 +8,14 @@ import 'dart:io';
 
 import 'package:gcloud/db.dart';
 import 'package:appengine/appengine.dart';
+import 'package:shelf/shelf.dart';
+import 'package:shelf_appengine/shelf_appengine.dart';
+import 'package:shelf_route/shelf_route.dart';
+import 'package:uri/uri.dart';
 
 import 'package:clientserver/model.dart';
 
-Key get itemsRoot => context.services.db.emptyKey.append(ItemsRoot, id: 1);
-
-Future sendJSONResponse(HttpRequest request, json) {
-  request.response
-      ..headers.contentType = ContentType.JSON
-      ..headers.set("Cache-Control", "no-cache")
-      ..add(UTF8.encode(JSON.encode(json)));
-
-  return request.response.close();
-}
-
-Future readJSONRequest(HttpRequest request) =>
-    request.transform(UTF8.decoder).transform(JSON.decoder).single;
+Key get itemsRoot => context.services.db.emptyKey.append(Item, id: 1);
 
 Future<List<Item>> queryItems() {
   var query = context.services.db.query(
@@ -31,51 +23,42 @@ Future<List<Item>> queryItems() {
   return query.run().toList();
 }
 
-handleItems(HttpRequest request) {
-  if (request.method == 'GET') {
-    return queryItems().then((List<Item> items) {
-      var result = items.map((item) => item.serialize()).toList();
-      var json = {'success': true, 'result': result};
-      return sendJSONResponse(request, json);
-    });
-  } else if (request.method == 'POST') {
-    return readJSONRequest(request).then((json) {
-      var item = Item.deserialize(json)..parentKey = itemsRoot;
-      var error = item.validate();
-      if (error != null) {
-        json = {'success': false, 'error': error};
-        return sendJSONResponse(request, json);
-      } else {
-        return context.services.db.commit(inserts: [item]).then((_) {
-          json = {'success': true};
-          return sendJSONResponse(request, json);
-        });
-      }
-    });
-  }
-}
-
-Future handleClean(HttpRequest request) {
-  return queryItems().then((items) {
-    var deletes = items.map((item) => item.key).toList();
-    return context.services.db.commit(deletes: deletes);
-  });
-}
-
-void requestHandler(HttpRequest request) {
-  if (request.uri.path == '/items') {
-    handleItems(request);
-  } else if (request.uri.path == '/clean') {
-    handleClean(request).then((_) {
-      request.response.redirect(Uri.parse('/index.html'));
-    });
-  } else if (request.uri.path == '/') {
-    request.response.redirect(Uri.parse('/index.html'));
-  } else {
-    context.assets.serve();
-  }
-}
+final itemsUrl = new UriParser(new UriTemplate('/items'));
+final cleanUrl = new UriParser(new UriTemplate('/clean'));
 
 void main() {
-  runAppEngine(requestHandler);
+
+  var routes = router()
+        ..get(itemsUrl, (request){
+          return queryItems()
+              .then((items) { 
+                var result = items.map((item) => item.serialize()).toList();
+                var json = {'success': true, 'result': result};
+                return new Response.ok(JSON.encode(json));
+            });
+                
+        })
+        ..post(itemsUrl, (Request request){
+            return request.readAsString().then((body) {
+              var json = JSON.decode(body);
+              var item = Item.deserialize(json)..parentKey = itemsRoot;
+              return context.services.db.commit(inserts: [item]).then((_) {
+                  json = {'success': true};
+                  return new Response.ok(JSON.encode(json));
+                });
+            });
+        })
+        ..get(cleanUrl, (request){
+            return queryItems().then((items) {
+              var deletes = items.map((item) => item.key).toList();
+              return context.services.db.commit(deletes: deletes);
+            }).then((_) => new Response.found("/"));
+        });
+   
+  var cascade = new Cascade()
+        .add(routes.handler)
+        .add(assetHandler(directoryIndexServeMode: DirectoryIndexServeMode.REDIRECT));
+  
+  serve(cascade.handler);
+  
 }
